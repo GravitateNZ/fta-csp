@@ -23,7 +23,6 @@ class AddCspHeaderListener implements EventSubscriberInterface
     {
         $this->cspHeader = $cspHeader;
         $this->cspOptions = $cspOptions;
-
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
