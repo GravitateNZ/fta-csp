@@ -1,0 +1,39 @@
+{
+    "name": "gravitatenz/fta-csp",
+    "description": "csp helper/nonce generator thingamagiggy",
+    "type": "no",
+    "license": "no",
+    "prefer-stable" : true,
+    "minimum-stability" : "dev",
+    "authors": [
+        {
+            "name": "John Lennard",
+            "email": "john@yakmoo.se"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "symfony/http-foundation": "v4.1.0",
+        "sensiolabs/security-checker": "^4.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6",
+        "roave/security-advisories": "dev-master"
+    },      
+    "suggest": {
+    },      
+    "autoload": {
+        "psr-4": {
+            "GravitateNZ\\fta\\csp\\" : "src/"
+          }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "GravitateNZ\\fta\\csp\\Tests\\": "tests/"
+      }
+    },
+    "repositories": [
+        {"type": "composer", "url": "https://repo.packagist.com/gravitatenz/"},
+        {"packagist.org": false}
+    ]   
+}
