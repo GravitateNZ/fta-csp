@@ -16,8 +16,6 @@
          bootstrap="vendor/autoload.php">
 
     <php>
-        <!-- this may not be needed here? not sure -->
-        <var name="DB_URL" value="mysql://dev_user:dev_passwd@localhost/orm_test" />
     </php>
 
     <filter>
@@ -31,8 +29,7 @@
     </filter>
 
     <testsuites>
-
-        <testsuite name="orm">
+        <testsuite name="csp">
             <directory>tests/</directory>
         </testsuite>
 
