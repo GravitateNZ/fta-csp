@@ -26,7 +26,7 @@ class CspNonceExtensionTest extends TestCase
     protected $extension;
 
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = new Request();
         $requestStack = new RequestStack();
@@ -34,7 +34,7 @@ class CspNonceExtensionTest extends TestCase
         $this->extension = new CspNonceExtension($requestStack);
     }
 
-    public function testNonce()
+    public function testNonce(): void
     {
         $nonce  = $this->extension->cspNonce();
         $this->assertNotNull($nonce);

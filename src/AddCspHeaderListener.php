@@ -11,7 +11,7 @@ namespace GravitateNZ\fta\csp;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class AddCspHeaderListener implements EventSubscriberInterface
 {
@@ -25,7 +25,7 @@ class AddCspHeaderListener implements EventSubscriberInterface
         $this->cspOptions = $cspOptions;
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -51,7 +51,7 @@ class AddCspHeaderListener implements EventSubscriberInterface
         $event->getResponse()->headers->set($this->cspHeader, $headers, false);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [KernelEvents::RESPONSE => 'onKernelResponse'];
     }
