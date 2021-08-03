@@ -36,11 +36,7 @@
         "GravitateNZ\\fta\\csp\\Tests\\": "tests/"
       }
     },
-    "repositories": [
-        {"type": "composer", "url": "https://repo.packagist.com/gravitatenz/"},
-        {"packagist.org": false}
-    ],
-"extra": {
+    "extra": {
         "branch-alias": {
             "dev-master": "2.1.x-dev"
         }
