@@ -2,7 +2,7 @@
     "name": "gravitatenz/fta-csp",
     "description": "csp helper/nonce generator thingamagiggy",
     "type": "library",
-    "license": "no",
+    "license": "BSD-3-Clause",
     "prefer-stable" : true,
     "minimum-stability" : "dev",
     "authors": [
