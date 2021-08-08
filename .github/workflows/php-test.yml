@@ -17,8 +17,6 @@ jobs:
       run: composer validate
 
     - name: Install dependencies
-      env:
-        COMPOSER_AUTH: "{\"github-oauth\": {\"github.com\": \"${{secrets.GITHUB_TOKEN}}\"},\"http-basic\": { \"repo.packagist.com\": { \"username\": \"token\", \"password\": \"${{secrets.COMPOSER_AUTH}}\"}}}"
       run: ${{ matrix.php }} `which composer` install --prefer-dist --no-progress --no-suggest
 
     - name: Run test suite
