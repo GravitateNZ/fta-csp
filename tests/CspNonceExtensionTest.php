@@ -9,54 +9,41 @@
 namespace GravitateNZ\fta\csp\Tests;
 
 
-use GravitateNZ\fta\csp\Twig\CspNonceExtension;
-use Symfony\Component\HttpFoundation\Request;
+use GravitateNZ\fta\csp\CspHeaderListener;
+use GravitateNZ\fta\csp\Twig\CspExtension;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Twig\TwigFunction;
+use Symfony\Component\HttpFoundation\Request;
 
 
+/**
+ * @covers GravitateNZ\fta\csp\Twig\CspExtension
+ * @uses GravitateNZ\fta\csp\CspHeaderListener
+ */
 class CspNonceExtensionTest extends TestCase
 {
 
     /** @var Request */
     protected $request;
 
-    /** @var CspNonceExtension */
+    /** @var CspExtension */
     protected $extension;
 
 
     protected function setUp(): void
     {
-        $this->request = new Request();
-        $requestStack = new RequestStack();
-        $requestStack->push($this->request);
-        $this->extension = new CspNonceExtension($requestStack);
+        $subscriber = new CspHeaderListener('Content-Security-Policy-Report-Only', ['default-src' => ["'none'"], 'form-action' => ["'none'"], 'frame-ancestors' => ["'none'"] ]);
+        $this->extension = new CspExtension($subscriber);
     }
 
     public function testNonce(): void
     {
-        $nonce  = $this->extension->cspNonce();
+        $nonce  = $this->extension->addCspNonce();
         $this->assertNotNull($nonce);
+        $this->assertEquals($nonce, $this->extension->addCspNonce());
 
-        $this->assertEquals($nonce, $this->extension->cspNonce());
+        $h = $this->extension->getListener()->getCspHeader();
 
-        $this->assertTrue($this->request->attributes->has('_nonce'));
-        $this->assertEquals($nonce, $this->request->attributes->get('_nonce'));
-    }
-
-    public function testGetFunctions()
-    {
-        $functions = $this->extension->getFunctions();
-        $this->assertCount(1, $functions);
-
-        $this->assertInstanceOf(TwigFunction::class, $functions[0]);
-
-        /** @var TwigFunction $function */
-        $function = $functions[0];
-
-        $this->assertEquals('nonce', $function->getName());
-        $this->assertTrue(is_callable($function->getCallable()));
+        $this->assertStringContainsString("nonce-{$nonce}", $h);
 
     }
 }

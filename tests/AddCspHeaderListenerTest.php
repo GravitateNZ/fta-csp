@@ -9,7 +9,7 @@
 namespace GravitateNZ\fta\csp\Tests;
 
 
-use GravitateNZ\fta\csp\AddCspHeaderListener;
+use GravitateNZ\fta\csp\CspHeaderListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +20,9 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * @covers GravitateNZ\fta\csp\CspHeaderListener
+ */
 class AddCspHeaderListenerTest extends TestCase
 {
 
@@ -32,11 +35,11 @@ class AddCspHeaderListenerTest extends TestCase
 
     public function testOnKernelResponse()
     {
-        $subscriber = new AddCspHeaderListener('Content-Security-Policy-Report-Only', ['default-src' => ["'none'"], 'form-action' => ["'none'"], 'frame-ancestors' => ["'none'"] ]);
+        $subscriber = new CspHeaderListener('Content-Security-Policy-Report-Only', ['default-src' => ["'none'"], 'form-action' => ["'none'"], 'frame-ancestors' => ["'none'"] ]);
 
         $request = new Request([], [], []);
         $response = new Response('', 200, []);
-        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $this->assertInstanceOf(EventSubscriberInterface::class, $subscriber);
 
@@ -49,9 +52,17 @@ class AddCspHeaderListenerTest extends TestCase
 
     public function testOnKernelResponseNonce()
     {
-        $subscriber = new AddCspHeaderListener('Content-Security-Policy-Report-Only', ['default-src' => ["'none'"], 'form-action' => ["'none'"], 'frame-ancestors' => ["'none'"] ]);
+        $subscriber = new CspHeaderListener(
+            'Content-Security-Policy-Report-Only',
+            [
+                'default-src' => ["'none'"],
+                'form-action' => ["'none'"],
+                'frame-ancestors' => ["'none'"],
+            ]
+        );
 
-        $request = new Request([], [], ['_nonce' => 'nonce']);
+        $subscriber->addCspDirective('script-src', "'nonce-nonce'");
+        $request = new Request([], [], []);
         $response = new Response('', 200, []);
         $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
 
@@ -66,10 +77,9 @@ class AddCspHeaderListenerTest extends TestCase
         $this->assertEquals($expected, $h);
     }
 
-
     public function testSubscribedEvents()
     {
-        $this->assertEquals(array(KernelEvents::RESPONSE => 'onKernelResponse'), AddCspHeaderListener::getSubscribedEvents());
+        $this->assertEquals(array(KernelEvents::RESPONSE => 'onKernelResponse'), CspHeaderListener::getSubscribedEvents());
     }
 
 }

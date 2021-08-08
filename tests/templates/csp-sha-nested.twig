@@ -1,0 +1,10 @@
+{% sha %}
+    <script>
+        const v  = "hello world";
+        const a = [
+        {% for i in 1..10 %}
+            {{ i }},
+        {% endfor %}
+        ];
+    </script>
+{% endsha %}
