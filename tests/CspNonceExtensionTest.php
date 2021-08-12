@@ -43,7 +43,7 @@ class CspNonceExtensionTest extends TestCase
 
         $h = $this->extension->getListener()->getCspHeader();
 
-        $this->assertStringContainsString("nonce-{$nonce}", $h);
+        $this->assertStringContainsString("'nonce-{$nonce}'", $h);
 
     }
 }
