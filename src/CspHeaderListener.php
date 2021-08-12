@@ -27,7 +27,7 @@ class CspHeaderListener implements EventSubscriberInterface
 
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$event->isMainRequest()) {
+        if (!$event->isMasterRequest()) {
             return;
         }
 
