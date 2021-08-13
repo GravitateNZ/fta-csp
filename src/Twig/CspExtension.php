@@ -47,12 +47,12 @@ class CspExtension extends AbstractExtension
      * @return string
      * @throws \Exception
      */
-    public function addCspNonce(): string
+    public function addCspNonce(string $directive = 'script-src'): string
     {
         //generate a nonce, return it and stuff it into a page...
         if (!$this->nonce) {
             $this->nonce = base64_encode(random_bytes(32));
-            $this->listener->addCspDirective('script-src', "'nonce-{$this->nonce}'");
+            $this->listener->addCspDirective($directive, "'nonce-{$this->nonce}'");
         }
         return $this->nonce;
     }
