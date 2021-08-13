@@ -17,7 +17,7 @@ use Twig\TwigFunction;
 class CspExtension extends AbstractExtension
 {
 
-    protected array $nonce = [];
+    protected ?string $nonce = null;
     protected CspHeaderListener $listener;
 
     public function __construct(CspHeaderListener $listener)
@@ -47,14 +47,14 @@ class CspExtension extends AbstractExtension
      * @return string
      * @throws \Exception
      */
-    public function addCspNonce(string $directive = 'default-src'): string
+    public function addCspNonce(string $directive = 'script-src'): string
     {
         //generate a nonce, return it and stuff it into a page...
-        if (!($this->nonce[$directive] ?? false)) {
-            $this->nonce[$directive] = base64_encode(random_bytes(32));
-            $this->listener->addCspDirective($directive, "'nonce-{$this->nonce[$directive]}'");
+        if (!$this->nonce) {
+            $this->nonce = base64_encode(random_bytes(32));
+            $this->listener->addCspDirective($directive, "'nonce-{$this->nonce}'");
         }
-        return $this->nonce[$directive];
+        return $this->nonce;
     }
 
     public function hash(string $body, string $algo = 'sha384'): array
