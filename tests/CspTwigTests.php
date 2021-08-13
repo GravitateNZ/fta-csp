@@ -8,6 +8,7 @@ use GravitateNZ\fta\csp\CspHeaderListener;
 use GravitateNZ\fta\csp\Twig\CspExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Twig\Cache\FilesystemCache;
 use Twig\Environment;
 use Twig\Error\SyntaxError;
 use Twig\Extension\AbstractExtension;
@@ -21,7 +22,7 @@ class CspTwigTests extends TestCase
     protected Environment $environment;
     protected AbstractExtension $extension;
 
-    protected function setUp(): void
+    protected function resetEnvironment(): void
     {
         $this->kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $subscriber = new CspHeaderListener('Content-Security-Policy-Report-Only', ['default-src' => ["'none'"], 'form-action' => ["'none'"], 'frame-ancestors' => ["'none'"] ]);
@@ -29,6 +30,11 @@ class CspTwigTests extends TestCase
 
         $this->environment = new Environment(new FilesystemLoader(__DIR__ . "/templates"));
         $this->environment->addExtension($this->extension);
+    }
+
+    protected function setUp(): void
+    {
+        $this->resetEnvironment();
     }
 
 
@@ -73,5 +79,28 @@ class CspTwigTests extends TestCase
         $s = $this->environment->render('csp-nonce.twig');
         $this->assertStringContainsString("nonce=\"{$this->extension->addCspNonce()}\"", $s);
 
+    }
+
+    public function testCaching()
+    {
+
+        $this->environment->setCache(new FilesystemCache(__DIR__ . "/cache"));
+
+        $this->environment->render('csp-sha.twig');
+
+        $this->assertStringContainsString(
+            "'sha384-DzjSswPV+DRLYHDP7Sk9YQ1QeE3tgIbO9Q8PfIsj9uFTABu3jjkII/hSWRLkpcd5'",
+            $this->extension->getListener()->getCspHeader()
+        );
+
+        $this->resetEnvironment();
+        $this->environment->setCache(new FilesystemCache(__DIR__ . "/cache"));
+
+        $this->environment->render('csp-sha.twig');
+
+        $this->assertStringContainsString(
+            "'sha384-DzjSswPV+DRLYHDP7Sk9YQ1QeE3tgIbO9Q8PfIsj9uFTABu3jjkII/hSWRLkpcd5'",
+            $this->extension->getListener()->getCspHeader()
+        );
     }
 }

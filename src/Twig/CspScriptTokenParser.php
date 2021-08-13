@@ -39,11 +39,6 @@ class CspScriptTokenParser extends \Twig\TokenParser\AbstractTokenParser
         $body = $this->parser->subparse([$this, 'decideApplyEnd'], true);
         $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
 
-        if ($body instanceof TextNode) {
-            $this->extension->addCspHash($body->getAttribute('data'));
-            return $body;
-        }
-
         return new CspHashNode(
             ['body' => $body],
             [],

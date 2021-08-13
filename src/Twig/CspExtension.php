@@ -57,7 +57,7 @@ class CspExtension extends AbstractExtension
         return $this->nonce;
     }
 
-    public function addCspHash(string $body, string $algo = 'sha384'): void
+    public function hash(string $body, string $algo = 'sha384'): array
     {
         $r = preg_match('/^\s*+<(?<type>script|style)[^>]*+>(?<body>(?s)(.*?))<\/(\1)>\s*?$/m', $body, $matches);
         if (!$r) {
@@ -66,10 +66,15 @@ class CspExtension extends AbstractExtension
 
         $hash = base64_encode(hash($algo, $matches['body'], true));
 
-        $this->addCspDirective(
+        return [
             "{$matches['type']}-src",
-            "'$algo-$hash'"
-        );
+            "'{$algo}-{$hash}'",
+        ];
+    }
+
+    public function addCspHash(string $body, string $algo = 'sha384'): void
+    {
+        $this->addCspDirective(...$this->hash($body, $algo));
     }
 
     public function addCspDirective(string $directive, string $value): void
