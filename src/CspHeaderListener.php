@@ -19,7 +19,7 @@ class CspHeaderListener implements EventSubscriberInterface
     protected string $cspHeader;
     protected array $cspOptions;
 
-    public function __construct(string $cspHeader = 'Content-Security-Policy-Report-Only', array $cspOptions = [])
+    public function __construct(string $cspHeader = '', array $cspOptions = [])
     {
         $this->cspHeader = $cspHeader;
         $this->cspOptions = $cspOptions;
@@ -31,11 +31,13 @@ class CspHeaderListener implements EventSubscriberInterface
             return;
         }
 
-        $event->getResponse()->headers->set(
-            $this->cspHeader,
-            $this->getCspHeader(),
-            false
-        );
+        if ($this->cspHeader) {
+            $event->getResponse()->headers->set(
+                $this->cspHeader,
+                $this->getCspHeader(),
+                false
+            );
+        }
     }
 
     public function getCspHeader(): string
@@ -48,10 +50,12 @@ class CspHeaderListener implements EventSubscriberInterface
 
     public function addCspDirective(string $directive, string $value): void
     {
-        if (!isset($this->cspOptions[$directive])) {
-            $this->cspOptions[$directive] = [];
+        if ($this->cspHeader) {
+            if ( ! isset($this->cspOptions[$directive])) {
+                $this->cspOptions[$directive] = [];
+            }
+            $this->cspOptions[$directive][] = $value;
         }
-        $this->cspOptions[$directive][]  = $value;
     }
 
     public static function getSubscribedEvents(): array
