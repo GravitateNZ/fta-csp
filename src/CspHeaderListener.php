@@ -21,12 +21,11 @@ class CspHeaderListener implements EventSubscriberInterface
 
     public function onKernelResponse(ResponseEvent $event): void
     {
-
         if (!$this->cspHeader) {
             return;
         }
 
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
@@ -47,10 +46,15 @@ class CspHeaderListener implements EventSubscriberInterface
 
     public function addCspDirective(string $directive, string $value): void
     {
-        if (!isset($this->cspOptions[$directive])) {
+        if (!$this->cspHeader) {
+            return;
+        }
+
+        if ( ! isset($this->cspOptions[$directive])) {
             $this->cspOptions[$directive] = [];
         }
-        $this->cspOptions[$directive][]  = $value;
+        $this->cspOptions[$directive][] = $value;
+
     }
 
     public static function getSubscribedEvents(): array
