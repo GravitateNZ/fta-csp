@@ -5,10 +5,10 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        php: [php7.4, php8.0]
+        php: [php8.1]
 
     steps:
     - uses: actions/checkout@v1

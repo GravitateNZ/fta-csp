@@ -13,21 +13,18 @@ use Twig\Token;
 class CspScriptTokenParser extends \Twig\TokenParser\AbstractTokenParser
 {
 
-    protected CspExtension $extension;
-
     /**
      * @param CspExtension $extension
      */
-    public function __construct(CspExtension $extension)
+    public function __construct(protected CspExtension $extension)
     {
-        $this->extension = $extension;
     }
 
 
     /**
      * @inheritDoc
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
         $name = $this->parser->getVarName();

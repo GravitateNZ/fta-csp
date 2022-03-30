@@ -15,18 +15,17 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class CspHeaderListener implements EventSubscriberInterface
 {
-
-    protected string $cspHeader;
-    protected array $cspOptions;
-
-    public function __construct(string $cspHeader = 'Content-Security-Policy-Report-Only', array $cspOptions = [])
+    public function __construct(protected string $cspHeader = '', protected array $cspOptions = [])
     {
-        $this->cspHeader = $cspHeader;
-        $this->cspOptions = $cspOptions;
     }
 
     public function onKernelResponse(ResponseEvent $event): void
     {
+
+        if (!$this->cspHeader) {
+            return;
+        }
+
         if (!$event->isMasterRequest()) {
             return;
         }
