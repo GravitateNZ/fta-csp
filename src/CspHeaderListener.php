@@ -15,29 +15,25 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class CspHeaderListener implements EventSubscriberInterface
 {
-
-    protected string $cspHeader;
-    protected array $cspOptions;
-
-    public function __construct(string $cspHeader = '', array $cspOptions = [])
+    public function __construct(protected string $cspHeader = '', protected array $cspOptions = [])
     {
-        $this->cspHeader = $cspHeader;
-        $this->cspOptions = $cspOptions;
     }
 
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (!$this->cspHeader) {
             return;
         }
 
-        if ($this->cspHeader) {
-            $event->getResponse()->headers->set(
-                $this->cspHeader,
-                $this->getCspHeader(),
-                false
-            );
+        if (!$event->isMainRequest()) {
+            return;
         }
+
+        $event->getResponse()->headers->set(
+            $this->cspHeader,
+            $this->getCspHeader(),
+            false
+        );
     }
 
     public function getCspHeader(): string
@@ -50,12 +46,15 @@ class CspHeaderListener implements EventSubscriberInterface
 
     public function addCspDirective(string $directive, string $value): void
     {
-        if ($this->cspHeader) {
-            if ( ! isset($this->cspOptions[$directive])) {
-                $this->cspOptions[$directive] = [];
-            }
-            $this->cspOptions[$directive][] = $value;
+        if (!$this->cspHeader) {
+            return;
         }
+
+        if ( ! isset($this->cspOptions[$directive])) {
+            $this->cspOptions[$directive] = [];
+        }
+        $this->cspOptions[$directive][] = $value;
+
     }
 
     public static function getSubscribedEvents(): array

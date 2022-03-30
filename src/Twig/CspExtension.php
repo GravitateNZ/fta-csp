@@ -18,12 +18,9 @@ class CspExtension extends AbstractExtension
 {
 
     protected ?string $nonce = null;
-    protected CspHeaderListener $listener;
 
-    public function __construct(CspHeaderListener $listener)
-    {
-        $this->listener = $listener;
-    }
+    public function __construct(protected CspHeaderListener $listener)
+    {}
 
     public function getFunctions(): array
     {
