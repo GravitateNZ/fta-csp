@@ -46,4 +46,25 @@ class CspNonceExtensionTest extends TestCase
         $this->assertStringContainsString("'nonce-{$nonce}'", $h);
 
     }
+
+
+    public function testCssNonce(): void
+    {
+        $scriptNonce = $this->extension->addCspNonce('script-src');
+        $styleNonce = $this->extension->addCspNonce('style-src');
+        $this->assertNotNull($scriptNonce);
+        $this->assertNotNull($styleNonce);
+
+        $this->assertNotEquals($styleNonce, $scriptNonce);
+
+        $this->assertEquals($scriptNonce, $this->extension->addCspNonce());
+        $this->assertEquals($styleNonce, $this->extension->addCspNonce('style-src'));
+
+        $h = $this->extension->getListener()->getCspHeader();
+
+        $this->assertStringContainsString("'nonce-{$scriptNonce}'", $h);
+        $this->assertStringContainsString("'nonce-{$styleNonce}'", $h);
+
+    }
+
 }
