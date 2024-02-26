@@ -27,7 +27,7 @@ class CspScriptTokenParser extends \Twig\TokenParser\AbstractTokenParser
     /**
      * @inheritDoc
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
         $name = $this->parser->getVarName();

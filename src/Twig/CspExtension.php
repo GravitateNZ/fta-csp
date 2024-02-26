@@ -1,23 +1,16 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: john
- * Date: 17/07/18
- * Time: 1:31 PM
- */
+<?php declare(strict_types=1);
 
 namespace GravitateNZ\fta\csp\Twig;
 
 
 use GravitateNZ\fta\csp\CspHeaderListener;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class CspExtension extends AbstractExtension
 {
 
-    protected ?string $nonce = null;
+    protected ?array $nonce = [];
     protected CspHeaderListener $listener;
 
     public function __construct(CspHeaderListener $listener)
@@ -50,11 +43,11 @@ class CspExtension extends AbstractExtension
     public function addCspNonce(string $directive = 'script-src'): string
     {
         //generate a nonce, return it and stuff it into a page...
-        if (!$this->nonce) {
-            $this->nonce = base64_encode(random_bytes(32));
-            $this->listener->addCspDirective($directive, "'nonce-{$this->nonce}'");
+        if (!isset($this->nonce[$directive])) {
+            $this->nonce[$directive] = base64_encode(random_bytes(32));
+            $this->listener->addCspDirective($directive, "'nonce-{$this->nonce[$directive]}'");
         }
-        return $this->nonce;
+        return $this->nonce[$directive];
     }
 
     public function hash(string $body, string $algo = 'sha384'): array
