@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: john
@@ -27,17 +27,19 @@ class CspHeaderListener implements EventSubscriberInterface
 
     public function onKernelResponse(ResponseEvent $event): void
     {
+        if (!$this->cspHeader) {
+            return;
+        }
+
         if (!$event->isMasterRequest()) {
             return;
         }
 
-        if ($this->cspHeader) {
-            $event->getResponse()->headers->set(
-                $this->cspHeader,
-                $this->getCspHeader(),
-                false
-            );
-        }
+        $event->getResponse()->headers->set(
+            $this->cspHeader,
+            $this->getCspHeader(),
+            false
+        );
     }
 
     public function getCspHeader(): string
@@ -50,12 +52,12 @@ class CspHeaderListener implements EventSubscriberInterface
 
     public function addCspDirective(string $directive, string $value): void
     {
-        if ($this->cspHeader) {
-            if ( ! isset($this->cspOptions[$directive])) {
-                $this->cspOptions[$directive] = [];
-            }
-            $this->cspOptions[$directive][] = $value;
+        if (!$this->cspHeader) {
+            return;
         }
+
+        $this->cspOptions[$directive][] ??= $value;
+
     }
 
     public static function getSubscribedEvents(): array
