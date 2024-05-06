@@ -7,31 +7,44 @@ namespace GravitateNZ\fta\csp\Twig;
 use Twig\Compiler;
 use Twig\Node\Node;
 use Twig\Node\TextNode;
+use Twig\Node\CaptureNode;
 
 class CspHashNode extends Node
 {
+    protected ?array $hash;
+
+    public function __construct(
+        Node $body, int $lineno, string $tag, ?array $hash = null,
+    ) {
+        $body = new CaptureNode($body, $lineno, $tag);
+        $body->setAttribute('raw', true);
+        $this->hash = $hash;
+        parent::__construct(['body' => $body], [], $lineno, $tag);
+    }
+
+
     public function compile(Compiler $compiler)
     {
-        $body = $this->getNode('body');
+        $compiler
+            ->addDebugInfo($this)
+            ->indent()
+            ->write("\$content = ")
+            ->subcompile($this->getNode('body'))
+            ->raw("\n")
+            ->outdent();
 
-        if ($body instanceof TextNode) {
-            $hash = $compiler->getEnvironment()->getExtension(CspExtension::class)->hash($body->getAttribute('data'));
+        if ($this->hash) {
             $output = <<< EOD
-\$this->env->getExtension(GravitateNZ\\fta\\csp\\Twig\\CspExtension::class)->addCspDirective("{$hash[0]}", "{$hash[1]}");
-echo ob_get_clean();
+\$this->env->getExtension(GravitateNZ\\fta\\csp\\Twig\\CspExtension::class)->addCspDirective("{$this->hash[0]}", "{$this->hash[1]}");
 EOD;
         } else {
             $output = <<< EOD
-\$s = ob_get_clean(); 
-\$this->env->getExtension(GravitateNZ\\fta\\csp\\Twig\\CspExtension::class)->addCspHash(\$s);
-echo \$s;
+\$this->env->getExtension(GravitateNZ\\fta\\csp\\Twig\\CspExtension::class)->addCspHash(\$content);
 EOD;
         }
 
-        $compiler
-            ->addDebugInfo($this)
-            ->write("ob_start();\n")
-            ->subcompile($body)
-            ->write($output);
+        $compiler->write($output);
+        // or can we yield?
+        $compiler->write("echo \$content;\n");
     }
 }
