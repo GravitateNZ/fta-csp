@@ -27,7 +27,7 @@ class CspScriptTokenParser extends \Twig\TokenParser\AbstractTokenParser
     /**
      * @inheritDoc
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
         $name = $this->parser->getVarName();
@@ -39,11 +39,17 @@ class CspScriptTokenParser extends \Twig\TokenParser\AbstractTokenParser
         $body = $this->parser->subparse([$this, 'decideApplyEnd'], true);
         $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
 
+        $hash = null;
+        if ($body instanceof TextNode) {
+            $hash = $this->extension->hash($body->getAttribute('data'));
+        }
+
+
         return new CspHashNode(
-            ['body' => $body],
-            [],
+            $body,
             $lineno,
-            $this->getTag()
+            $this->getTag(),
+            $hash,
         );
     }
 
