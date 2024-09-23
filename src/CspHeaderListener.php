@@ -56,7 +56,11 @@ class CspHeaderListener implements EventSubscriberInterface
             return;
         }
 
-        $this->cspOptions[$directive][] ??= $value;
+        if (!isset($this->cspOptions[$directive])) {
+            $this->cspOptions[$directive] = [];
+        }
+
+        $this->cspOptions[$directive][] = $value;
 
     }
 
